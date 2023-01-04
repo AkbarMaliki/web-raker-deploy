@@ -50,7 +50,10 @@
     </style>
 </head>
 <body>
+   <!-- <script src="./assets/qrcode2.js"></script> -->
    <script src="./assets/qrcode.min.js"></script>
+   <!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js"  integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"  crossorigin="anonymous"></script>
+   <script src="./assets/jquery-qrcode.min.js"></script> -->
    <script src="./assets/htmlcanvas.js"></script>
    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
    <div id="app">
@@ -100,6 +103,9 @@
             </div>
         </div>
         <div v-else>
+            <div class="demo mt-5">
+
+            </div>
             <div class="row justify-content-center">
                 <div class="col-sm-6 p-4">
                     <br>
@@ -161,7 +167,7 @@
             setTimeout(() => {
                 var qrcode = new QRCode(document.getElementById("qrcode"), {
                     width : 100,
-                    height : 100
+                    height : 100,
                 });
                 qrcode.makeCode(item.id);
                 setTimeout(() => {
@@ -178,6 +184,16 @@
        },
        mounted() {
         this.getData();
+        console.log(window)
+            $(".demo").qrcode({
+                // 0: normal
+                // 1: label strip
+                // 2: label box
+                mode: 1,
+                label: 'Maliki',
+                fontname: 'sans',
+                fontcolor: '#000'
+            });
        },
      }).mount('#app')
    </script>
