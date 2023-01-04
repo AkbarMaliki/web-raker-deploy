@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./home.css">
+    <link rel="stylesheet" href="./all.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alkalami&family=Lustria&display=swap" rel="stylesheet">
+    <style>
+        .style-nama{
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            font-size:28px;
+            color:#2C5B9A;
+            margin-bottom: 4px;
+            letter-spacing:7px;word-spacing: 6px;
+            font-family: 'Lustria', serif;
+        }
+    </style>
+</head>
+<body >
+   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+   <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
+   <div id="app">
+       <div v-if="slide" style="height:100vh;width:100vw;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg ">
+            <img src="assets/bgNew.gif" style="width:100%;height:100%;position:absolute;z-index:-1;" alt="">
+            <div style="width:100%;" class="text-left">
+                <br>
+                <br>
+                <div class="animate__animated animate__bounce animate__infinite animasi " style="margin-bottom:29vh;margin-left:5.9vw;">
+                    <h1 class="style-nama font-semibold animate__animated animate__fadeInRightBig">Selamat Datang</h1>
+                    <h1 class="style-nama font-semibold animate__animated animate__fadeInLeftBig">{{tamu['nama']}} </h1>
+                    <h1 class="style-nama font-semibold animate__animated animate__backInDown">{{tamu['jabatan']}}</h1>
+                </div>
+            </div>
+    </div>
+    <div v-show="!slide" style="height:100vh;">
+        <div v-if="slideAktif">
+            <div v-if="listTamu.length>0" class="splide  "  role="group" aria-label="Splide Basic HTML Example">
+                <div class="splide__track" >
+                    <ul class="splide__list">
+                        <li class="splide__slide"  v-for="(item, index) in listTamu" :key="index+'listamu'">
+                            <div style="height:100vh;width:100vw;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg ">
+                                    <img src="assets/bgNew.gif" style="width:100%;height:100%;position:absolute;z-index:-1;" alt="">
+                                    <div style="width:100%;" class="text-left">
+                                        <br>
+                                        <br>
+                                        <div class="animate__animated  animasi " style="margin-bottom:29vh;margin-left:5.7vw;">
+                                            <h1 class="style-nama font-semibold animate__animated animate__fadeInRightBig">Selamat Datang</h1>
+                                            <h1 class="style-nama font-semibold animate__animated animate__fadeInLeftBig">{{item['nama']}} </h1>
+                                            <h1 class="style-nama font-semibold animate__animated animate__backInDown">{{item['jabatan']}}</h1>
+                                        </div>
+                                    </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            </div>
+        </div>
+   </div>
+   <script type="module">
+    import "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+    import  'https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js';
+    let data = await fetch('./assets/loading.js').then(res=>res.text());
+    const firebaseConfig = JSON.parse(data);
+    const app=firebase.initializeApp(firebaseConfig)
+    const db = app.firestore();
+     const { createApp } = Vue
+     createApp({
+        data(){
+            return{
+                tamu:[],
+                listTamu:[],
+                slide:false,
+                slideAktif:false
+            }
+        },
+       methods: {
+        async getData(){
+            let that=this;
+            db.collection('qr').doc('WVBWwHV1Qjq6d73BGGgO').onSnapshot(res=>{
+                let id =res.data().id_qr;
+                this.slide=true;
+                db.collection('tamu').doc(res.data().id_qr).onSnapshot(res2=>{
+                    let data=res2.data()
+                    that.tamu= data
+                    setTimeout(() => {
+                        that.slide=false;
+                        that.$forceUpdate();
+                    }, 5000);
+                    // document.querySelectorAll('.tamu').forEach(e=>{
+                    //     e.classList.toggle('animate__backInLeft')
+                    // })
+                    // setTimeout(() => {
+                    //     document.querySelectorAll('.tamu').forEach(e=>{
+                    //         e.classList.toggle('animate__backInDown')
+                    //     })                        
+                    // }, 1000);
+                })
+            })
+        },
+        async getData2(){
+            let that=this;
+            db.collection('tamu-datang').onSnapshot(res=>{
+                that.slideAktif=false;
+                let data = res.docs.map(e=>e.data())
+                this.listTamu=data;
+                setTimeout(() => {
+                    that.slideAktif=true;
+                    setTimeout(() => {
+                        var splide = new Splide( '.splide', {
+                            type   : 'loop',
+                            drag   : 'free',
+                            focus  : 'center',
+                            perPage: 1,
+                            autoScroll: {
+                                speed: 2,
+                            },
+                        });
+    
+                        splide.mount(window.splide.Extensions);
+                    }, 1000);
+                }, 1000);
+            })
+        }
+       },
+       mounted() {
+        this.getData();
+        this.getData2();
+       
+       },
+     }).mount('#app')
+   </script>
+      
+</body>
+</html>

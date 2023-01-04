@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Tamu</title>
+    <link rel="stylesheet" href="./all.css">
+    <link rel="stylesheet" href="./home.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+
+        /* .undangan {
+            background-image: url(assets/card.png);
+            background-size: cover;
+        } */
+
+        .font__header{
+            /* font-family: 'Playfair Display', serif; */
+            font-family: 'Dancing Script', cursive;
+        }
+        
+        .font__headerr{
+            /* font-family: 'Cinzel Decorative', cursive; */
+            font-family: 'Dancing Script', cursive;
+            text-transform: uppercase;
+            color: blue;
+        }
+
+        .font__body{
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* .font__bold{
+            font-weight: bold;
+            color: blue;
+        }
+
+        .font__semibold{
+            font-weight: 600;
+            color: blue;
+        } */
+
+        .waktu{
+            
+        }
+    </style>
+</head>
+<body>
+   <script src="./assets/qrcode.min.js"></script>
+   <script src="./assets/htmlcanvas.js"></script>
+   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+   <div id="app">
+        <div v-if="showqr">
+            <div >
+                <div class="row">
+                    <div id="capture" class="col-sm-3 shadow p-2 rounded-lg text-center undangan">
+                        <img src="./assets/card.png" style="position: absolute;z-index: -1;height: 100%;width: 100%; top: 0; left: 0;" alt="">
+                        <img src="./assets/logo_hasnur.png" class="d-inline" style="width:50px;height:50px;" alt="">
+                        <img src="./assets/hdi.png" class="d-inline ml-3" style="width:50px;height:45px;" alt="">
+                        <h4 style="color: rgb(24, 36, 102); font-size: 25px; font-weight: bolder;word-spacing: 4px;" class="font__headerr m-1">UNDANGAN</h4>
+                        <p class="text-sm font__body m-1">Kami Mengundang Anda <br> Pada Rapat Kerja Tahunan HIT DIGITAL</p>
+
+                        <!-- <div class="font__bold">
+                            <span class="m-3">Jumat</span> <span>G.H Universal Hotel Bandung</span>
+                        </div>
+                        <div class="font__semibold">
+                            <span class="m-5">20/01/2023</span> <span>Milano Ballroom</span>
+                        </div> -->
+                        <div class="row justify-content-center mt-2">
+                            <div class="col-8 text-center font__body" style="color: rgb(24, 36, 102); font-size: 13px;">
+                                <p class="m-0">
+                                    Jumat, 20 Januari 2023
+                                </p>
+                                <p class="m-0">G.H Universal Hotel Bandung</p>
+                                <p class="m-0">Formal Batik</p>
+                            </div>
+                        </div>
+                        <!-- <table class="text-center" style="color: blue;">
+                            <tr>
+                                <td class="font-semibold font__body">Jumat 20/01/2022</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold font__body">G.H Universal Hotel Bandung</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold font__body">Formal Batik</td>
+                            </tr>
+                        </table> -->
+                        <div class="text-center">
+                            <div id="qrcode" class="text-center" style="margin-left:8.2vw;width:100px; height:100px; margin-top:15px;"></div>
+                        </div>
+                        <p style="font-size: 10px;" class="font__body">(Show the QR code during registration)</p>
+                        <p class="mt-3 font__header" style="color: rgb(24, 36, 102); font-size: 25px; font-weight: bolder; word-spacing: 4px;">Sampai Jumpa</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-else>
+            <div class="row justify-content-center">
+                <div class="col-sm-6 p-4">
+                    <br>
+                    <p class="text-sm font-semibold text-center">Generate Kartu/QR Undangan !</p>
+                    <hr>
+                    <div class="sm-form ">
+                        <label for="search">Search</label>
+                        <input type="text" id="search" name="search" class="form-control p-2 rounded-lg shadow" placeholder="search" v-model="search" >
+                    </div>
+                    <div v-for="(item, index) in td" :key="index+'tamu'" class="my-2">
+                        <div @click="showQR(item)" class="my-0 hover:bg-blue-400 cursor-pointer font-semibold shadow text-xs rounded-lg p-2 animate__animated  tamu">
+                            {{item['nama']}} -  {{item['jabatan']}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+   </div>
+   <script type="module">
+    import "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+    import  'https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js';
+    let data = await fetch('./assets/loading.js').then(res=>res.text());
+    const firebaseConfig = JSON.parse(data);
+    const app=firebase.initializeApp(firebaseConfig)
+    const db = app.firestore();
+     const { createApp } = Vue
+     createApp({
+        data(){
+            return{
+                tamu:[],
+                tamunya:{},
+                search:'',
+                showqr:false
+            }
+        },
+        computed:{
+            td(){
+                let data=this.tamu;
+                data=data.filter(e=>e.nama.toLowerCase().indexOf(this.search)!=-1)
+                return data;
+            }
+        },
+       methods: {
+        async getData(){
+            let that=this;
+            db.collection('tamu').onSnapshot(res2=>{
+                let data = res2.docs.map(e=>{
+                    return {
+                        id:e.id,
+                        ...e.data()
+                    }
+                })
+                that.tamu= data
+            })
+        },
+        showQR(item){
+            this.tamunya=item;
+            this.showqr=true;
+            setTimeout(() => {
+                var qrcode = new QRCode(document.getElementById("qrcode"), {
+                    width : 100,
+                    height : 100
+                });
+                qrcode.makeCode(item.id);
+                setTimeout(() => {
+                    html2canvas(document.querySelector("#capture")).then(canvas => {
+                        var link = document.createElement('a');
+                        link.download = item.nama+'.png';
+                        link.href = canvas.toDataURL()
+                        link.click();
+                        this.showqr=false;
+                    });
+                }, 2000);
+            }, 1000);
+        }
+       },
+       mounted() {
+        this.getData();
+       },
+     }).mount('#app')
+   </script>
+      
+</body>
+</html>

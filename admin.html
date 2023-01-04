@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="./all.css">
+</head>
+<body>
+   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+   <div id="app">
+        <div style="height:100vh;" class="p-3">
+            <div class="row justify-content-center">
+                <div class="col-sm-12">
+                    <p class="my-3 p-3 text-center font-semibold">ADMIN</p>
+                    <div class="row justify-content-center">
+                        <div class="col-sm-8">
+                            <div class="p-3">
+                                <a href="./list-tamu.html" class="">
+                                    <button type="button" class="btn btn-sm btn-dark ">Generate QR</button>
+                                </a>
+                                <a href="./scan.html" class="ml-2">
+                                    <button type="button" class="btn btn-sm btn-primary ">Scan QR</button>
+                                </a>
+                                <a href="./list-tamu-datang.html" class="ml-2">
+                                    <button type="button" class="btn btn-sm btn-warning">Tamu Datang</button>
+                                </a>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="p-2 shadow rounded-lg">
+                                    <form @submit.prevent='submitForm'>
+                                        <div class="sm-form ">
+                                            <label for="name">Nama</label>
+                                            <input type="text" id="name" name="name" class="form-control p-2 rounded-lg shadow" placeholder="name" v-model="name" >
+                                        </div>
+                                        <div class="sm-form ">
+                                            <label for="jabatan">Jabatan</label>
+                                            <input type="text" id="jabatan" name="jabatan" class="form-control p-2 rounded-lg shadow" placeholder="jabatan" v-model="jabatan" >
+                                        </div>
+                                        <br>
+                                        <button type="submit" class="btn btn-sm btn-dark  ">Simpan</button>
+                                    </form>
+                                </div>
+                
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="p-2 shadow rounded-lg">
+                                    <div class="sm-form ">
+                                        <input type="text" id="search" name="search" class="form-control p-2 rounded-lg shadow" placeholder="search" v-model="search" >
+                                    </div>
+                                    <div v-for="(item, index) in td" :key="index+'tamu'" class="my-2">
+                                        <button type="button" @click="hapus(item)" class="btn btn-sm btn-danger float-right ">x</button>
+                                        <div  class="my-0 hover:bg-blue-400 cursor-pointer d-inline font-semibold shadow text-xs rounded-lg p-2 animate__animated  tamu">
+                                            {{item['nama']}} -  {{item['jabatan']}} 
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+   </div>
+   <script type="module">
+    import "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+    import  'https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js';
+    let data = await fetch('./assets/loading.js').then(res=>res.text());
+    const firebaseConfig = JSON.parse(data);
+    const app=firebase.initializeApp(firebaseConfig)
+    const db = app.firestore();
+     const { createApp } = Vue
+     createApp({
+        data(){
+            return {
+                name: '',
+                listTamu:[],
+                jabatan: '',
+                search:''
+            }
+        },
+        computed:{
+            td(){
+                let data=this.listTamu;
+                data=data.filter(e=>e.nama.toLowerCase().indexOf(this.search.toLowerCase())!=-1)
+                return data;
+            }
+        },
+       methods: {
+        hapus(item){
+            db.collection(`tamu`).doc(item.id).delete().then(res=>{
+                console.log('berhasil')
+            }).catch(err=>{
+                console.log(err.message)
+            })
+        },
+        async getData(){
+            let that=this;
+            db.collection('qr').doc('WVBWwHV1Qjq6d73BGGgO').onSnapshot(res=>{
+                let id =res.data().id_qr;
+                db.collection('tamu').doc(res.data().id_qr).onSnapshot(res2=>{
+                    let data=res2.data()
+                    that.tamu= data
+                    document.querySelectorAll('.tamu').forEach(e=>{
+                        e.classList.toggle('animate__backInDown')
+                    })
+                    setTimeout(() => {
+                        document.querySelectorAll('.tamu').forEach(e=>{
+                            e.classList.toggle('animate__backInDown')
+                        })                        
+                    }, 1000);
+                })
+            })
+        },
+        async getData2(){
+            let that=this;
+            db.collection('tamu').onSnapshot(res2=>{
+                let data = res2.docs.map(e=>{
+                    return {
+                        id:e.id,
+                        ...e.data()
+                    }
+                })
+                that.listTamu= data
+            })
+        },
+        submitForm(){
+            // CREATE
+            db.collection(`tamu`).doc().set({nama:this.name,jabatan:this.jabatan},{merge:true}).then(res=>{
+                this.name='';
+                this.jabatan='';
+            }).catch(err=>{
+                console.log(err.message)
+            })
+        }
+       },
+       mounted() {
+        this.getData();
+        this.getData2();
+       },
+     }).mount('#app')
+   </script>
+      
+</body>
+</html>

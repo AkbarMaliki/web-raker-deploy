@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Poppins:ital,wght@0,100;1,900&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@600&display=swap');
+
+body{
+  width: 100vw;
+    /* background-image: url(assets/Background_Raker.gif); */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    text-align: center;
+}
+
+:root {
+    --bg-color: hsl(49 37% 94%);
+    --typewriterSpeed: 6s;
+    --typewriterCharacters: 24;
+  }
+  
+.animate__pulse {
+  animation-delay: 1s;
+}
+
+.animasi {
+  animation-duration: 2s;
+}
+  
+h1 {
+    margin: 0;
+    /* color: rgba(5, 34, 77, .85); */
+    color: black;
+    text-shadow: 4px 2px 4px rgba(5, 34, 77, 0.7);
+    line-height: normal;
+    font-size: 5rem;
+    font-weight: bold;
+    font-family: 'Lora', serif;
+    /* font-family: 'Montserrat', sans-serif; */
+    text-transform: uppercase;
+  }
+
+.undangan {
+  background-image: url(assets/undangan.png);
+}
+  
+/* h1::before,
+h1::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+} */
+/*   
+h1::before {
+    background: var(--bg-color);
+    animation: typewriter var(--typewriterSpeed)
+        steps(var(--typewriterCharacters)) 1s forwards;
+} */
+  
+/* h1::after {
+    width: 0.125em;
+    background: black;
+    animation: typewriter var(--typewriterSpeed)
+        steps(var(--typewriterCharacters)) 1s forwards,
+        blink 750ms steps(var(--typewriterCharacters)) infinite;
+} */
+/*   
+  @keyframes typewriter {
+    to {
+      left: 100%;
+    }
+  }
+  
+  @keyframes blink {
+    to {
+      background: transparent;
+    }
+  }
+  
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  } */
+  
+  
