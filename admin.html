@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./all.css">
 </head>
 <body>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
    <div id="app">
         <div style="height:100vh;" class="p-3">
@@ -107,6 +108,7 @@
                 let id =res.data().id_qr;
                 db.collection('tamu').doc(res.data().id_qr).onSnapshot(res2=>{
                     let data=res2.data()
+                    // data= _.orderBy(data, ['nama'],['asc']);
                     that.tamu= data
                     document.querySelectorAll('.tamu').forEach(e=>{
                         e.classList.toggle('animate__backInDown')
@@ -128,6 +130,7 @@
                         ...e.data()
                     }
                 })
+                data= _.orderBy(data, ['nama'],['asc']);
                 that.listTamu= data
             })
         },
