@@ -62,19 +62,23 @@
             <div >
                 <div class="row">
                     <div id="capture" class="col-sm-3 shadow p-2 rounded-lg text-center undangan">
-                        <img src="./assets/card.png" style="position: absolute;z-index: -1;height: 100%;width: 100%; top: 0; left: 0;" alt="">
-                        <img src="./assets/logo_hasnur.png" class="d-inline" style="width:50px;height:50px;" alt="">
-                        <img src="./assets/hdi.png" class="d-inline ml-3" style="width:50px;height:45px;" alt="">
-                        <h4 style="color: rgb(24, 36, 102); font-size: 25px; font-weight: bolder;word-spacing: 4px;" class="font__headerr m-1">UNDANGAN</h4>
-                        <p class="text-sm font__body m-1">Kami Mengundang Anda <br> Pada Rapat Kerja Tahunan HIT DIGITAL</p>
-
+                        <img src="./assets/card2.PNG" style="position:absolute;height: 100%;width: 100%; top: 0; left: 0;" alt="">
+                        <!-- <img src="./assets/logo_hasnur.png" class="d-inline" style="width:50px;height:50px;" alt="">
+                        <img src="./assets/hdi.png" class="d-inline ml-3" style="width:50px;height:45px;" alt=""> -->
+                        <!-- <h4 style="color: rgb(24, 36, 102); font-size: 25px; font-weight: bolder;word-spacing: 4px;" class="font__headerr m-1">UNDANGAN</h4> -->
+                        <!-- <p class="text-sm font__body m-1">Kami Mengundang Anda <br> Pada Rapat Kerja Tahunan HIT DIGITAL</p> -->
+                        <div style="height:130px;"></div>
+                        <!-- <hr class="ml-3 style1"> -->
+                        <p class="text-sm font__body font-semibold m-1" style="position:relative;z-index:10;">{{tamunya.nama}}</p>
+                        <p class="text-sm font-semibold font__body m-1" style="position:relative;z-index:10;">({{tamunya.jabatan}})</p>
+                        <div style="height:40px;"></div>
                         <!-- <div class="font__bold">
                             <span class="m-3">Jumat</span> <span>G.H Universal Hotel Bandung</span>
                         </div>
                         <div class="font__semibold">
                             <span class="m-5">20/01/2023</span> <span>Milano Ballroom</span>
                         </div> -->
-                        <div class="row justify-content-center mt-2">
+                        <!-- <div class="row justify-content-center mt-2">
                             <div class="col-8 text-center font__body" style="color: rgb(24, 36, 102); font-size: 13px;">
                                 <p class="m-0">
                                     Jumat, 20 Januari 2023
@@ -82,7 +86,7 @@
                                 <p class="m-0">G.H Universal Hotel Bandung</p>
                                 <p class="m-0">Formal Batik</p>
                             </div>
-                        </div>
+                        </div> -->
                         <!-- <table class="text-center" style="color: blue;">
                             <tr>
                                 <td class="font-semibold font__body">Jumat 20/01/2022</td>
@@ -94,11 +98,11 @@
                                 <td class="font-semibold font__body">Formal Batik</td>
                             </tr>
                         </table> -->
-                        <div class="text-center">
+                        <!-- <div class="text-center">
                             <div id="qrcode" class="text-center" style="margin-left:8.2vw;width:100px; height:100px; margin-top:15px;"></div>
-                        </div>
-                        <p style="font-size: 10px;" class="font__body">(Show the QR code during registration)</p>
-                        <p class="mt-3 font__header" style="color: rgb(24, 36, 102); font-size: 25px; font-weight: bolder; word-spacing: 4px;">Sampai Jumpa</p>
+                        </div> -->
+                        <!-- <p style="font-size: 10px;" class="font__body">(Show the QR code during registration)</p> -->
+                        <!-- <p class="mt-3 font__header" style="color: rgb(24, 36, 102); font-size: 25px; font-weight: bolder; word-spacing: 4px;">Sampai Jumpa</p> -->
                     </div>
                 </div>
             </div>
@@ -110,7 +114,7 @@
             <div class="row justify-content-center">
                 <div class="col-sm-6 p-4">
                     <br>
-                    <p class="text-sm font-semibold text-center">Generate Kartu/QR Undangan !</p>
+                    <p class="text-sm font-semibold text-center">Generate TTD undangan!</p>
                     <hr>
                     <div class="sm-form ">
                         <label for="search">Search</label>
@@ -167,12 +171,12 @@
             this.tamunya=item;
             this.showqr=true;
             setTimeout(() => {
-                var qrcode = new QRCode(document.getElementById("qrcode"), {
-                    width : 100,
-                    height : 100,
-                });
-                qrcode.makeCode(item.id);
-                setTimeout(() => {
+                // var qrcode = new QRCode(document.getElementById("qrcode"), {
+                //     width : 100,
+                //     height : 100,
+                // });
+                // qrcode.makeCode(item.id);
+                // setTimeout(() => {
                     html2canvas(document.querySelector("#capture")).then(canvas => {
                         var link = document.createElement('a');
                         link.download = item.nama+'.png';
@@ -180,7 +184,7 @@
                         link.click();
                         this.showqr=false;
                     });
-                }, 2000);
+                // }, 2000);
             }, 1000);
         }
        },
