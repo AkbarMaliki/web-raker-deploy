@@ -10,7 +10,9 @@
 <body>
    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
-   <div id="app">
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.1/xlsx.full.min.js"></script> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.9.0/date_fns.min.js"></script>
+  <div id="app">
         <div style="width:100vw;height:100vh;">
             <img src="./assets/Background Raker HIT 2023 Yellow White.gif" style="position:absolute;z-index:-1;width:100%;height:100%;" alt="">
             <div style="height:100vh;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg">
@@ -21,14 +23,18 @@
         </div>
         <div class="p-3 ">
             <div class="bg-white p-3 rounded-lg">
+                <button type="button" @click="downloadExcel" class="btn btn-sm btn-success">Excel</button>
+                <button type="button" @click="hapusData" class="btn btn-sm btn-danger ml-2">Hapus</button>
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered">
                         <tr>
                             <th>Nama</th>
+                            <th>Jabatan</th>
                             <th>Waktu</th>
                         </tr>
                         <tr v-for="(item, index) in listScanned" :key="index+'listScanned'">
                             <td >{{item.nama}}</td>
+                            <td >{{item.jabatan}}</td>
                             <td >{{item.waktu}}</td>
                         </tr>
                     </table>
@@ -55,44 +61,67 @@
             }
         },
        methods: {
+            downloadExcel(data) {
+                var ws = XLSX.utils.json_to_sheet(this.listScanned);
+                var wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Sheet 1");
+                XLSX.writeFile(wb,'Tamu-datang.xlsx');
+            },
+            hapusData(){
+                if(!confirm('Apakah yakin hapus data ini?')){
+                    return;
+                }
+                this.listScanned=[];
+                localStorage.removeItem('listtamu')
+                this.$forceUpdate();
+            },
            startScanner(){
                let that=this;
-            const audioElement = document.getElementById('myAudio');
-            that.$forceUpdate();
-            setTimeout(() => {
-                var html5QrcodeScanner = new Html5QrcodeScanner(
-                    "reader", { fps: 10, qrbox: 250 });
-                        
-                function onScanSuccess(decodedText, decodedResult) {
-                    db.collection(`tamu`).doc(decodedText).get().then(res=>{
-                        let data = res.data();
-                        let listNama=that.listScanned.map(e=>e.nama)
-                        if(!listNama.includes(data['nama'])){
-                            audioElement.play();
-                            db.collection(`tamu-datang`).doc().set(data,{merge:true}).then(res=>{
-                                console.log('berhasil')
-                            }).catch(err=>{
-                                console.log(err.message)
-                            })
-                            that.listScanned.push({nama:data['nama'],waktu:new Date()})
-                            localStorage.setItem('listtamu',JSON.stringify(that.listScanned));
-                        }else{
-                            console.log(`data ${data['nama']} sudah di scan`);
-                        }
-                    })
-                    db.collection(`qr`).doc('WVBWwHV1Qjq6d73BGGgO').set({id_qr:decodedText},{merge:true}).then(res=>{
-                        console.log('berhasil')
-                    }).catch(err=>{
-                        console.log(err.message)
-                    })
-                }
+                const audioElement = document.getElementById('myAudio');
+                that.$forceUpdate();
+                setTimeout(() => {
+                    var html5QrcodeScanner = new Html5QrcodeScanner(
+                        "reader", { fps: 10, qrbox: 250 });
+                            
+                    function onScanSuccess(decodedText, decodedResult) {
+                        db.collection(`tamu`).doc(decodedText).get().then(res=>{
+                            let data = res.data();
+                            let listNama=that.listScanned.map(e=>e.nama)
+                            if(!listNama.includes(data['nama'])){
+                                audioElement.play();
+                                db.collection(`tamu-datang`).doc().set(data,{merge:true}).then(res=>{
+                                    console.log('berhasil')
+                                }).catch(err=>{
+                                    console.log(err.message)
+                                })
+                                that.listScanned.push({nama:data['nama'],jabatan:data['jabatan'],waktu:that.formatTgl(new Date(),'DD-MM-YYYY HH:mm:ss')})
+                                localStorage.setItem('listtamu',JSON.stringify(that.listScanned));
+                            }else{
+                                console.log(`data ${data['nama']} sudah di scan`);
+                            }
+                        })
+                        db.collection(`qr`).doc('WVBWwHV1Qjq6d73BGGgO').set({id_qr:decodedText},{merge:true}).then(res=>{
+                            console.log('berhasil')
+                        }).catch(err=>{
+                            console.log(err.message)
+                        })
+                    }
 
-                html5QrcodeScanner.render(onScanSuccess);
-            }, 1000);
-            }
+                    html5QrcodeScanner.render(onScanSuccess);
+                }, 1000);
+            },
+            formatTgl(tgl,pattern="YYYY-MM-DD") {
+                return dateFns.format(
+                    new Date(tgl),
+                    pattern
+                );
+            },
        },
        mounted() {
             this.startScanner();
+            if(localStorage.getItem('listtamu')){
+                this.listScanned=JSON.parse(localStorage.getItem('listtamu'));
+            }
        },
      }).mount('#app')
    </script>
