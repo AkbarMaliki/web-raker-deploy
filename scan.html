@@ -11,9 +11,31 @@
    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
    <div id="app">
+        <div style="width:100vw;height:100vh;">
+            <img src="./assets/Background Raker HIT 2023 Yellow White.gif" style="position:absolute;z-index:-1;width:100%;height:100%;" alt="">
+            <div style="height:100vh;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg">
+                <div style="width:100%">
+                    <div style="width: 500px;margin-left:30%;" id="reader"></div>
+                </div>
+            </div>
+        </div>
+        <div class="p-3 ">
+            <div class="bg-white p-3 rounded-lg">
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <tr>
+                            <th>Nama</th>
+                            <th>Waktu</th>
+                        </tr>
+                        <tr v-for="(item, index) in listScanned" :key="index+'listScanned'">
+                            <td >{{item.nama}}</td>
+                            <td >{{item.waktu}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
         <!-- <div id="reader" style="height:300px;width:100vw;" class=""></div> -->
-        {{listScanned}}
-        <div style="width: 500px" id="reader"></div>
         {{result}}
         <audio id="myAudio" src="notif.wav"></audio>
    </div>
@@ -44,14 +66,16 @@
                 function onScanSuccess(decodedText, decodedResult) {
                     db.collection(`tamu`).doc(decodedText).get().then(res=>{
                         let data = res.data();
-                        if(!that.listScanned.includes(data['nama'])){
+                        let listNama=that.listScanned.map(e=>e.nama)
+                        if(!listNama.includes(data['nama'])){
                             audioElement.play();
                             db.collection(`tamu-datang`).doc().set(data,{merge:true}).then(res=>{
                                 console.log('berhasil')
                             }).catch(err=>{
                                 console.log(err.message)
                             })
-                            that.listScanned.push(data['nama'])
+                            that.listScanned.push({nama:data['nama'],waktu:new Date()})
+                            localStorage.setItem('listtamu',JSON.stringify(that.listScanned));
                         }else{
                             console.log(`data ${data['nama']} sudah di scan`);
                         }

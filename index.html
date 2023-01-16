@@ -19,6 +19,10 @@
             letter-spacing:7px;word-spacing: 6px;
             font-family: 'Lustria', serif;
         }
+        body{
+            margin:0;
+            padding:0;
+        }
     </style>
 </head>
 <body >
@@ -27,42 +31,42 @@
    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
    <div id="app">
-    <div v-if="slide" style="height:100vh;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg ">
+    <div v-if="slide" style="height:97vh;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg animate__animated animate__fadeIn">
         <img src="assets/bgNew.gif" style="width:100%;height:100%;position:absolute;z-index:-1;" alt="">
         <div style="width:100%;" class="text-left">
             <br>
             <br>
-            <div class="animate__animated animate__bounce animate__infinite animasi " style="margin-bottom:29vh;margin-left:5.9vw;">
-                <h1 class="style-nama font-semibold animate__animated animate__fadeInRightBig">Selamat Datang</h1>
-                <h1 class="style-nama font-semibold animate__animated animate__fadeInLeftBig">{{tamu['nama']}} </h1>
-                <h1 class="style-nama font-semibold animate__animated animate__backInDown">{{tamu['jabatan']}}</h1>
+            <div class="animate__animated animate__bounce animate__infinite animasi  " style="margin-bottom:29vh;margin-left:5.9vw;">
+                <h1 class="style-nama font-semibold animate__delay-1s animate__animated animate__fadeInRightBig">Selamat Datang</h1>
+                <h1 class="style-nama font-semibold animate__delay-1s animate__animated animate__fadeInLeftBig">{{tamu['nama']}} </h1>
+                <h1 class="style-nama font-semibold animate__delay-1s animate__animated animate__backInDown">{{tamu['jabatan']}}</h1>
             </div>
         </div>
     </div>
-    <div v-show="!slide" style="height:100vh;">
+    <!-- <div v-show="!slide" style="height:100vh;">
         <div v-if="slideAktif">
-            <div v-if="listTamu.length>0" class="splide  "  role="group" aria-label="Splide Basic HTML Example">
-                <div class="splide__track" >
-                    <ul class="splide__list">
-                        <li class="splide__slide"  v-for="(item, index) in listTamu" :key="index+'listamu'">
-                            <div style="height:100vh;width:100vw;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg ">
-                                    <img src="assets/bgNew.gif" style="width:100%;height:100%;position:absolute;z-index:-1;" alt="">
-                                    <div style="width:100%;" class="text-left">
-                                        <br>
-                                        <br>
-                                        <div class="animate__animated  animasi " style="margin-bottom:29vh;margin-left:5.7vw;">
-                                            <h1 class="style-nama font-semibold animate__animated animate__fadeInRightBig">Selamat Datang</h1>
-                                            <h1 class="style-nama font-semibold animate__animated animate__fadeInLeftBig">{{item['nama']}} </h1>
-                                            <h1 class="style-nama font-semibold animate__animated animate__backInDown">{{item['jabatan']}}</h1>
-                                        </div>
+        <div v-if="listTamu.length>0" class="splide  "  role="group" aria-label="Splide Basic HTML Example">
+            <div class="splide__track" >
+                <ul class="splide__list">
+                    <li class="splide__slide"  v-for="(item, index) in listTamu" :key="index+'listamu'">
+                        <div style="height:100vh;width:100vw;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg ">
+                                <img src="assets/bgNew.gif" style="width:100%;height:100%;position:absolute;z-index:-1;" alt="">
+                                <div style="width:100%;" class="text-left">
+                                    <br>
+                                    <br>
+                                    <div class="animate__animated  animasi " style="margin-bottom:29vh;margin-left:5.7vw;">
+                                        <h1 class="style-nama font-semibold animate__animated animate__fadeInRightBig">Selamat Datang</h1>
+                                        <h1 class="style-nama font-semibold animate__animated animate__fadeInLeftBig">{{item['nama']}} </h1>
+                                        <h1 class="style-nama font-semibold animate__animated animate__backInDown">{{item['jabatan']}}</h1>
                                     </div>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+                                </div>
+                        </div>
+                    </li>
+                </ul>
             </div>
         </div>
+        </div>
+    </div> -->
    </div>
    <script type="module">
     import "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
@@ -77,6 +81,7 @@
             return{
                 tamu:[],
                 listTamu:[],
+                offTamu:[],
                 slide:false,
                 slideAktif:false
             }
@@ -86,14 +91,15 @@
             let that=this;
             db.collection('qr').doc('WVBWwHV1Qjq6d73BGGgO').onSnapshot(res=>{
                 let id =res.data().id_qr;
-                this.slide=true;
-                db.collection('tamu').doc(res.data().id_qr).onSnapshot(res2=>{
-                    let data=res2.data()
-                    that.tamu= data
+                this.slide=false;
+                that.tamu=that.offTamu.filter(e=>e.id==id)[0]
+                // db.collection('tamu').doc(res.data().id_qr).onSnapshot(res2=>{
+                    // let data=res2.data()
+                    // that.tamu= data
                     setTimeout(() => {
-                        // that.slide=false;
+                        that.slide=true;
                         that.$forceUpdate();
-                    }, 5000);
+                    }, 500);
                     // document.querySelectorAll('.tamu').forEach(e=>{
                     //     e.classList.toggle('animate__backInLeft')
                     // })
@@ -102,7 +108,7 @@
                     //         e.classList.toggle('animate__backInDown')
                     //     })                        
                     // }, 1000);
-                })
+                // })
             })
         },
         async getData2(){
@@ -131,7 +137,18 @@
         }
        },
        mounted() {
-        this.getData();
+        db.collection('tamu').onSnapshot(res2=>{
+            this.offTamu= res2.docs.map(e=>{
+                return {
+                    id:e.id,
+                    ...e.data()
+                }
+            })
+            console.log('offtamu',this.offTamu)
+        });
+        setTimeout(() => {
+            this.getData();
+        }, 1000);
         // this.getData2();
        
        },
