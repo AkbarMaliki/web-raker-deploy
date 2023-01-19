@@ -17,7 +17,7 @@
             <img src="./assets/Background Raker HIT 2023 Yellow White.gif" style="position:absolute;z-index:-1;width:100%;height:100%;" alt="">
             <div style="height:100vh;" class="d-flex justify-content-center align-items-center shadow-lg rounded-lg">
                 <div style="width:100%">
-                    <div style="width: 800px;margin-left:18%;" id="reader"></div>
+                    <div style="width: 100vw;height:100vh;" id="reader"></div>
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@
                 that.$forceUpdate();
                 setTimeout(() => {
                     var html5QrcodeScanner = new Html5QrcodeScanner(
-                        "reader", { fps: 10, qrbox: 250 ,aspectRatio: 2});
+                        "reader", { fps: 10, qrbox: 600,aspectRatio: 2 });
                             
                     function onScanSuccess(decodedText, decodedResult) {
                         db.collection(`tamu`).doc(decodedText).get().then(res=>{

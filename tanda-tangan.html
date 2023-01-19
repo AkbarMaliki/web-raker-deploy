@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Tamu</title>
+    <link rel="stylesheet" href="./all.css">
+    <link rel="stylesheet" href="./home.css">
+    
+</head>
+<body>
+   <!-- <script src="./assets/qrcode2.js"></script> -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.4/html5-qrcode.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+   <!-- <script src="./assets/qrcode.min.js"></script> -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+   <!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js"  integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"  crossorigin="anonymous"></script>
+   <script src="./assets/jquery-qrcode.min.js"></script> -->
+   <script src="./assets/htmlcanvas.js"></script>
+   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+   <div id="app">
+    <div class="row justify-content-center">
+        <div class="col-sm-6 mt-6 shadow rounded-sm p-4">
+            <div class="row justify-content-center mt-3">
+                <div class="col-4"><img src="./assets/logo_hasnur.png" style="height:80px;width:95px;display:block;margin:auto;" alt=""></div>
+                <div class="col-4"><img src="./assets/hdi.png" style="height:80px;width:80px;display:block;margin:auto;" alt=""></div>
+            </div>
+            <hr class="style3">
+            <div v-if="!pilih">
+                <p class="font-semibold m-1">Untuk mengakses Tanda tangan komitmen bersama,</p>
+                <p class="font-semibold m-1">Silahkan Login dengan Upload QR Undangan anda : </p>
+                <div class="sm-form ">
+                    <input type="file" id="filenya" name="filenya" class="form-control p-2 rounded-lg shadow" placeholder="filenya" @change="upload" >
+                </div>
+                <hr class="style3">
+                <!-- <div class="row justify-content-center">
+                    <div class="col-6">
+                        <button type="button" v-if="filenya" class="btn btn-sm btn-dark" @click="reset">
+                            Reset
+                        </button>
+                    </div>
+                    <div class="col-6">
+                        <button type="button" @click="login" v-if="filenya"  class="btn btn-sm btn-primary   waves-effect">Login</button>
+                    </div>
+                </div> -->
+                <div id="reader" v-show="false" style="height:120px;width:70px;"></div>
+            </div>
+            <div v-else>
+                <div v-if="berhasil" class="bg-green-400 mt-3 roudned-sm shadow text-center text-lg p-4 animate__animated animate__fadeInDown">
+                    Tanda Tangan Berhasil di simpan !
+                </div>
+                <p class="font-semibold">Selamat Datang {{pilih.nama}} !</p>
+                <hr class="style2">
+                <p class="text-xs font-semibold">Silahkan Tanda Tangan dibawah Ini </p>
+                <canvas id="canvas" class="signature-pad shadow p-1 rounded-lg" width=360 height=300></canvas>
+                <br>
+                <button type="button" @click="saveTTD" class="btn btn-sm btn-style10 ">Simpan Tanda Tangan</button>
+                <br>
+                <button type="button" @click="clearCanvas" class="btn btn-sm btn-style10  mt-3" style="background:rgba(39, 39, 52, 0.685);">Clear TTD</button>
+                <!-- <canvas id="canvas"  class="shadow p-1 rounded-lg"></canvas> -->
+            </div>
+        </div>
+    </div>
+   </div>
+   <script type="module">
+    import "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js";
+    import  'https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js';
+    let data = await fetch('./assets/loading.js').then(res=>res.text());
+    const firebaseConfig = JSON.parse(data);
+    const app=firebase.initializeApp(firebaseConfig)
+    const db = app.firestore();
+    var signaturePad;
+     const { createApp } = Vue
+     createApp({
+        data(){
+            return{
+                tamu:[],
+                tamunya:{},
+                search:'',
+                showqr:false,
+                pilih:null,
+                filenya:null,
+                berhasil:false
+            }
+        },
+        computed:{
+            td(){
+                let data=this.tamu;
+                data=data.filter(e=>e.nama.toLowerCase().indexOf(this.search)!=-1)
+                return data;
+            }
+        },
+       methods: {
+        async getData(){
+            let that=this;
+            db.collection('tamu').get().then(res2=>{
+                let data = res2.docs.map(e=>{
+                    return {
+                        id:e.id,
+                        ...e.data()
+                    }
+                })
+                data= _.orderBy(data, ['nama'],['asc']);
+                that.tamu= data
+            })
+        },
+        upload(e){
+            let that=this;
+            this.filenya=e.target.files[0]
+            const html5QrCode = new Html5Qrcode("reader");
+            const imageFile =this.filenya;
+            // Scan QR Code
+            html5QrCode.scanFile(imageFile, true)
+            .then(decodedText => {
+                that.pilih=that.tamu.filter(e=>e.id==decodedText)[0]
+                that.$forceUpdate();
+                setTimeout(() => {
+                    const canvas = document.querySelector("canvas");
+                    signaturePad = new SignaturePad(canvas,{
+                        minWidth: 2,
+                        maxWidth: 2,
+                    });
+                }, 1000);
+            })
+            .catch(err => {
+                // failure, handle it.
+                alert('Data QR tidak ditemukan !')
+                console.log(`Error scanning file. Reason: ${err}`)
+            });
+        },
+        clearCanvas(){
+            signaturePad.clear();
+        },
+        saveTTD(){
+            let image=signaturePad.toDataURL()
+            db.collection(`ttd-bersama`).doc(this.pilih.id).set({nama:this.pilih.nama,jabatan:this.pilih.jabatan,ttd:image,idnya:this.pilih.id},{merge:true}).then(res=>{
+                console.log('berhasil')
+                this.berhasil=true;
+                this.$forceUpdate();
+                setTimeout(() => {
+                    this.berhasil=false;
+                    this.$forceUpdate();
+                }, 4000);
+            }).catch(err=>{
+                console.log(err.message)
+            })
+            console.log(image)
+        }
+       },
+       mounted() {
+        this.getData();
+        
+       },
+     }).mount('#app')
+   </script>
+      
+</body>
+</html>
